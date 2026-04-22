@@ -42,6 +42,10 @@ def main():
     EXTRACTED_FOLDER_PATH = TMP_WORKSPACE_PATH / EXTRACTED_FOLDER_NAME
     shutil.unpack_archive(ZIP_FILE_PATH, EXTRACTED_FOLDER_PATH)
 
+    # delete if it already exists in install location
+    INSTALLED_PATH = APPS_DIR / APP_NAME
+    shutil.rmtree(INSTALLED_PATH, ignore_errors=True)
+
     # move to app location
     shutil.move(EXTRACTED_FOLDER_PATH, APPS_DIR)
 
@@ -58,10 +62,12 @@ def main():
     # create shim
     SHIM_EXE_ORIGINAL_PATH = THIS_DIR / "shim.exe"
     SHIM_EXE_TARGET_PATH = BIN_DIR / (APP_NAME + ".exe")
-    SHIM_TEXT_PATH = BIN_DIR / (APP_NAME + ".shim")
+    SHIM_EXE_TARGET_PATH.unlink(missing_ok=True)  # remove if it already exists
     shutil.copy(SHIM_EXE_ORIGINAL_PATH, SHIM_EXE_TARGET_PATH)
 
     # write shim text
+    SHIM_TEXT_PATH = BIN_DIR / (APP_NAME + ".shim")
+    SHIM_TEXT_PATH.unlink(missing_ok=True)  # remove if it already exists
     with open(SHIM_TEXT_PATH, "w") as file:
         file.write(f"path = {EXECUTABLE_PATH}")
     # remove tmp dir
